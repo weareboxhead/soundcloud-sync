@@ -276,8 +276,6 @@ class SoundcloudEntries extends Component
 			'soundcloudDescription'			=>	$data['description'],
 			'soundcloudDurationMachine'		=>	$data['duration'],
 			'soundcloudDurationHuman'		=>	$this->formatTime($data['duration']),
-			'soundcloudFileSize'			=>	isset($data['original_content_size']) ? $data['original_content_size']: '',
-			'soundcloudPermalink'			=>	isset($data['permalink']) ? $data['permalink'] : '',
 			'soundcloudPermalinkUrl'		=>	$data['permalink_url'],
 			'soundcloudPurchaseUrl'			=>	$data['purchase_url'],
 			'soundcloudWaveformUrl'			=>	$data['waveform_url'],
@@ -285,9 +283,9 @@ class SoundcloudEntries extends Component
 			'soundcloudPlaybackCount'		=>	$data['playback_count'],
 			'soundcloudDownloadCount'		=>	$data['download_count'],
 			'soundcloudFavoritingsCount'	=>	$data['favoritings_count'],
-			'soundcloudOriginalFormat'		=>	isset($data['original_format']) ? $data['original_format'] : '',
 			'soundcloudDownloadable'		=>	($data['download_url'] && $data['downloadable']) ? $data['download_url'] : '',
-			'soundcloudArtwork500'			=> 	str_replace('large.jpg', 't500x500.jpg', 	$artworkUrl)
+			'soundcloudArtwork500'			=> 	str_replace('large.jpg', 't500x500.jpg', $artworkUrl),
+			'soundcloudArtwork300'			=> 	str_replace('large.jpg', 't300x300.jpg', $artworkUrl)
         ];
 
 		$categories = new SoundcloudCategories();
