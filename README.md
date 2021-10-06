@@ -37,7 +37,7 @@ This plugin authorizes with the Soundcloud API using the 'client_credentials' gr
 
 ## Using Soundcloud Sync
 
-Soundcloud Sync can be set to run periodically using a Cron task pointing at `{{ your site url }}/actions/soundcloud-sync/sync`. This will search for an create new Craft entries for any Soundcloud tracks that don't yet exist, and will update any existing entries with an updated playback count.
+Soundcloud Sync can be set to run periodically using a Cron task pointing at `{{ your site url }}/actions/soundcloud-sync/sync`. This will search for an create new Craft entries for any Soundcloud tracks that don't yet exist, and will update any existing entries with an updated counts for playback, favourited and comments.
 
 ## Soundcloud Sync Roadmap
 

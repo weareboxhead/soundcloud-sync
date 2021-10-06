@@ -274,8 +274,11 @@ class SoundcloudEntries extends Component
             'soundcloudFileId'				=>	$data['id'],
 			'soundcloudUserPermalink'		=>	$data['user']['permalink'],
 			'soundcloudDescription'			=>	$data['description'],
-			'soundcloudDurationMachine'		=>	$data['duration'],
+			'soundcloudDuration'		    =>	$data['duration'],
 			'soundcloudDurationHuman'		=>	$this->formatTime($data['duration']),
+			'soundcloudBpm'	            	=>	$data['bpm'],
+			'soundcloudRelease'	            =>	$data['release'],
+			'soundcloudStreamable'          =>	$data['streamable'],
 			'soundcloudPermalinkUrl'		=>	$data['permalink_url'],
 			'soundcloudPurchaseUrl'			=>	$data['purchase_url'],
 			'soundcloudWaveformUrl'			=>	$data['waveform_url'],
@@ -283,7 +286,8 @@ class SoundcloudEntries extends Component
 			'soundcloudPlaybackCount'		=>	$data['playback_count'],
 			'soundcloudDownloadCount'		=>	$data['download_count'],
 			'soundcloudFavoritingsCount'	=>	$data['favoritings_count'],
-			'soundcloudDownloadable'		=>	($data['download_url'] && $data['downloadable']) ? $data['download_url'] : '',
+			'soundcloudCommentCount'	    =>	$data['comment_count'],
+			'soundcloudDownloadUrl'	    	=>	($data['download_url'] && $data['downloadable']) ? $data['download_url'] : '',
 			'soundcloudArtwork500'			=> 	str_replace('large.jpg', 't500x500.jpg', $artworkUrl),
 			'soundcloudArtwork300'			=> 	str_replace('large.jpg', 't300x300.jpg', $artworkUrl)
         ];
@@ -346,8 +350,10 @@ class SoundcloudEntries extends Component
         
     	// Anything we like can go here
     	$entry->setFieldValues([
-    		'soundcloudPlaybackCount' => $remoteEntry['playback_count'],
-            'soundcloudStreamUrl' => $remoteEntry['streamUrl'] ?? ''
+    		'soundcloudPlaybackCount'       => $remoteEntry['playback_count'],
+			'soundcloudDownloadCount'		=>	$remoteEntry['download_count'],
+			'soundcloudFavoritingsCount'	=>	$remoteEntry['favoritings_count'],
+            'soundcloudStreamUrl'           => $remoteEntry['streamUrl'] ?? ''
         ]);
 
     	if (!Craft::$app->elements->saveElement($entry)) {

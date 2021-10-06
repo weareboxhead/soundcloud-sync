@@ -140,7 +140,7 @@ class SoundcloudCategories extends Component
 			
 			// Save the category
 			if (!Craft::$app->elements->saveElement($newCategory)) {
-				Craft::error('SiteModule: Couldn’t save the category "' . $newCategory->title . '"', __METHOD__);
+				Craft::error('SoundcloudSync: Couldn’t save the category "' . $newCategory->title . '"', __METHOD__);
 
 				return false;
 			}
