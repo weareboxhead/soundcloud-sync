@@ -1,0 +1,75 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * Soundcloud Sync plugin for Craft CMS 3.x
+ *
+ * Soundcloud Sync Settings.twig
+ *
+ * @author    Boxhead
+ * @copyright Copyright (c) 2021 Boxhead
+ * @link      https://boxhead.io
+ * @package   SoundcloudSync
+ * @since     1.0.0
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+
+{% do view.registerAssetBundle("boxhead\\soundcloudsync\\assetbundles\\soundcloudsync\\SoundcloudSyncAsset") %}
+
+{{ forms.autosuggestField({
+        label: 'Soundcloud Client ID',
+        instructions: 'Provided when you register an application at soundcloud.com',
+        id: 'soundcloudClientId',
+        name: 'soundcloudClientId',
+        value: settings.soundcloudClientId,
+        suggestEnvVars: true
+    })
+}}
+
+{{ forms.autosuggestField({
+        label: 'Soundcloud Client Secret',
+        instructions: 'Provided when you register an application at soundcloud.com',
+        id: 'soundcloudClientSecret',
+        name: 'soundcloudClientSecret',
+        value: settings.soundcloudClientSecret,
+        suggestEnvVars: true
+    })
+}}
+
+{{ forms.autosuggestField({
+        label: 'Soundcloud User ID',
+        instructions: 'Optionally provide a specific Soundcloud User ID to request data from. The default will be to get the data from the authorized Soundcloud user.',
+        id: 'soundcloudUserId',
+        name: 'soundcloudUserId',
+        value: settings.soundcloudUserId,
+        suggestEnvVars: true
+    })
+}}
+
+{{ forms.textField({
+        label: 'Section ID',
+        instructions: 'The ID of the section to save the Soundcloud track data as entries to.',
+        id: 'sectionId',
+        name: 'sectionId',
+        value: settings.sectionId
+    })
+}}
+
+{{ forms.textField({
+        label: 'Entry Type ID',
+        instructions: 'The ID of the Entry Type to save the entries as.',
+        id: 'entryTypeId',
+        name: 'entryTypeId',
+        value: settings.entryTypeId
+    })
+}}
+
+{{ forms.textField({
+        label: 'Category Groups',
+        instructions: 'A comma separated list of category prefixes e.g. series, speaker',
+        id: 'categoryGroups',
+        name: 'categoryGroups',
+        value: settings.categoryGroups
+    })
+}}
