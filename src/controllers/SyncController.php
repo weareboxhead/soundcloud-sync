@@ -16,7 +16,6 @@ use craft\web\Controller;
 use boxhead\soundcloudsync\SoundcloudSync;
 use boxhead\soundcloudsync\jobs\SoundcloudSyncCreateEntry;
 use boxhead\soundcloudsync\jobs\SoundcloudSyncUpdateEntry;
-use boxhead\soundcloudsync\jobs\SoundcloudSyncData as SoundcloudSyncDataJob;
 
 /**
  * SyncController Controller
