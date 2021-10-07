@@ -92,9 +92,7 @@ class SyncController extends Controller
     }
 
     public function actionGetStreamUrl() {
-        $request = Craft::$app->getRequest();
-
-        $trackId = $request->getParam('trackId');
+        $trackId = Craft::$app->request->getQueryParam('trackId');
 
 		$url = SoundcloudSync::$plugin->soundcloudEntries->getTrackStreamUrl($trackId);
 
