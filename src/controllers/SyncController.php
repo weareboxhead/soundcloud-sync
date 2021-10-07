@@ -48,7 +48,7 @@ class SyncController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['index'];
+    protected $allowAnonymous = ['index', 'get-stream-url'];
 
     // Public Methods
     // =========================================================================
@@ -90,5 +90,17 @@ class SyncController extends Controller
 		}
 
         return 'Soundcloud Sync running';
+    }
+
+    public function actionGetStreamUrl() {
+        $request = Craft::$app->getRequest();
+
+        $trackId = $request->getParam('trackId');
+
+		$url = SoundcloudSync::$plugin->soundcloudEntries->getTrackStreamUrl($trackId);
+
+        return $this->asJson([
+            'url' => $url
+        ]);
     }
 }

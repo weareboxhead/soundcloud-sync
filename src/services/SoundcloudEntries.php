@@ -258,11 +258,6 @@ class SoundcloudEntries extends Component
     }
 
 	private function saveFieldData($entry, $data) {
-        // Get the stream URL
-        if ($data['streamable']) {
-            $data['streamUrl'] = $this->getTrackStreamUrl($data['id']);
-        }
-
         // Check for whether this track has its own artwork, and if not, use the avatar
 		if (!empty($data['artwork_url'])) {
 			$artworkUrl = $data['artwork_url'];
@@ -282,7 +277,7 @@ class SoundcloudEntries extends Component
 			'soundcloudPermalinkUrl'		=>	$data['permalink_url'],
 			'soundcloudPurchaseUrl'			=>	$data['purchase_url'],
 			'soundcloudWaveformUrl'			=>	$data['waveform_url'],
-			'soundcloudStreamUrl'			=>	$data['streamUrl'] ?? '',
+			'soundcloudStreamUrl'			=>	$data['stream_url'] ?? '',
 			'soundcloudPlaybackCount'		=>	$data['playback_count'],
 			'soundcloudDownloadCount'		=>	$data['download_count'],
 			'soundcloudFavoritingsCount'	=>	$data['favoritings_count'],
@@ -343,17 +338,11 @@ class SoundcloudEntries extends Component
         ->id($entryId)
         ->one();
         
-        // Get the stream URL
-        if ($remoteEntry['streamable']) {
-            $remoteEntry['streamUrl'] = $this->getTrackStreamUrl($remoteEntry['id']);
-        }
-        
     	// Anything we like can go here
     	$entry->setFieldValues([
     		'soundcloudPlaybackCount'       => $remoteEntry['playback_count'],
-			'soundcloudDownloadCount'		=>	$remoteEntry['download_count'],
-			'soundcloudFavoritingsCount'	=>	$remoteEntry['favoritings_count'],
-            'soundcloudStreamUrl'           => $remoteEntry['streamUrl'] ?? ''
+			'soundcloudDownloadCount'		=> $remoteEntry['download_count'],
+			'soundcloudFavoritingsCount'	=> $remoteEntry['favoritings_count']
         ]);
 
     	if (!Craft::$app->elements->saveElement($entry)) {
