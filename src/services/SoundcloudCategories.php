@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Soundcloud Sync plugin for Craft CMS 3.x
  *
@@ -10,14 +11,12 @@
 
 namespace boxhead\soundcloudsync\services;
 
-use boxhead\soundcloudsync\SoundcloudSync;
-
 use Craft;
+use DateTime;
 use craft\base\Component;
 use craft\elements\Category;
 use craft\helpers\StringHelper;
-use DateTime;
-
+use boxhead\soundcloudsync\SoundcloudSync;
 use boxhead\soundcloudsync\wrapper\services\Services_Soundcloud;
 
 /**
@@ -36,14 +35,14 @@ use boxhead\soundcloudsync\wrapper\services\Services_Soundcloud;
 class SoundcloudCategories extends Component
 {
     // Any multiple word tags will be split by this
-	private $quote;
-	private $quoteLength;
+    private $quote;
+    private $quoteLength;
 
-	function __construct()
-	{
-		$this->quote = '"';
-		$this->quoteLength = strlen($this->quote);
-	}
+    public function __construct()
+    {
+        $this->quote = '"';
+        $this->quoteLength = strlen($this->quote);
+    }
 
     // Public Methods
     // =========================================================================
@@ -54,7 +53,7 @@ class SoundcloudCategories extends Component
      *
      * From any other plugin file, call it like this:
      *
-     *     SoundcloudSync::$plugin->soundcloudCategories->exampleService()
+     *     SoundcloudSync::getInstance()->soundcloudCategories->exampleService()
      *
      * @return mixed
      */
@@ -62,188 +61,184 @@ class SoundcloudCategories extends Component
     // {
     //     $result = 'something';
     //     // Check our Plugin's settings for `someAttribute`
-    //     if (SoundcloudSync::$plugin->getSettings()->someAttribute) {
+    //     if (SoundcloudSync::getInstance()-->getSettings()->someAttribute) {
     //     }
 
     //     return $result;
     // }
 
-	private function camelCase($string)
-	{
-		$parts = explode(' ', strtolower($string));
+    private function camelCase($string)
+    {
+        $parts = explode(' ', strtolower($string));
 
-		$string = '';
+        $string = '';
 
-		foreach ($parts as $part) {
-			if (strlen($string)) {
-				$part = ucfirst($part);
-			}
+        foreach ($parts as $part) {
+            if (strlen($string)) {
+                $part = ucfirst($part);
+            }
 
-			$string .= $part;
-		}
+            $string .= $part;
+        }
 
-		return $string;
-	}
+        return $string;
+    }
 
-	private function existingCategorysId($categoryGroupId, $category)
-	{
-		// Get all the categories from this group
-		$query = Category::find()
-			->groupId($categoryGroupId)
-			->all();
+    private function existingCategorysId($categoryGroupId, $category)
+    {
+        // Get all the categories from this group
+        $query = Category::find()
+            ->groupId($categoryGroupId)
+            ->all();
 
-		foreach ($query as $existingCategory) {
-			// If this category was found, return its id
-			if ($existingCategory->slug === StringHelper::toKebabCase($category)) {
-				return $existingCategory->id;
-			}
-		}
+        foreach ($query as $existingCategory) {
+            // If this category was found, return its id
+            if ($existingCategory->slug === StringHelper::toKebabCase($category)) {
+                return $existingCategory->id;
+            }
+        }
 
-		// If none were found, return false
-		return false;
-	}
+        // If none were found, return false
+        return false;
+    }
 
-	private function saveSpecialCategory($group, $category)
-	{
-		// Get the handle for this group
-		$groupHandle = $this->camelCase($group);
-		
-		// Get the category group
-		$categoryGroup = Category::find()
-			->group($groupHandle)
-			->one();
+    private function saveSpecialCategory($group, $category)
+    {
+        // Get the handle for this group
+        $groupHandle = $this->camelCase($group);
 
-		// Get the category group id
-		$categoryGroupId = $categoryGroup->groupId;
+        // Get the category group
+        $categoryGroup = Category::find()
+            ->group($groupHandle)
+            ->one();
 
-		// Remove any quotes from the category
-		if (substr($category, 0, 1) === $this->quote) {
-			$category = substr($category, 1, strlen($category) - 2);
-		}
+        // Get the category group id
+        $categoryGroupId = $categoryGroup->groupId;
 
-		// Remove the marker (Remove the length of the marker plus the colon)
-		$category = substr($category, strlen($group) + 1);
+        // Remove any quotes from the category
+        if (substr($category, 0, 1) === $this->quote) {
+            $category = substr($category, 1, strlen($category) - 2);
+        }
 
-		// Get the id of this category
-		$id = $this->existingCategorysId($categoryGroupId, $category);
+        // Remove the marker (Remove the length of the marker plus the colon)
+        $category = substr($category, strlen($group) + 1);
 
-		// If this category doesn't currently exist (no id was found), create it
-		if (!$id) {
-			// Create a new category model
-			$newCategory = new Category();
-			
-			// Set the group id
-			$newCategory->groupId = $categoryGroupId;
-			
-			// Set the title
-			$newCategory->title = $category;
-			
-			// Save the category
-			if (!Craft::$app->elements->saveElement($newCategory)) {
-				Craft::error('SoundcloudSync: Couldn’t save the category "' . $newCategory->title . '"', __METHOD__);
+        // Get the id of this category
+        $id = $this->existingCategorysId($categoryGroupId, $category);
 
-				return false;
-			}
-			
-			// Get this id
-			$id = $newCategory->id;
-		}
+        // If this category doesn't currently exist (no id was found), create it
+        if (!$id) {
+            // Create a new category model
+            $newCategory = new Category();
 
-		return [$id];
-	}
+            // Set the group id
+            $newCategory->groupId = $categoryGroupId;
 
-	private function separateSpecialCategories($data, $standardCategories, $categoryGroups)
-	{
-		// Set up an empty array
-		$categoriesArray = array();
+            // Set the title
+            $newCategory->title = $category;
 
-		foreach ($categoryGroups as $group) {
-			$startingIndex = strpos($standardCategories, strtolower($group) . ':');
+            // Save the category
+            if (!Craft::$app->elements->saveElement($newCategory)) {
+                Craft::error('SoundcloudSync: Couldn’t save the category "' . $newCategory->title . '"', __METHOD__);
 
-			// If we found this special marker in the standard categories
-			if ($startingIndex !== false) {
-				// If this category has a quote before it, look for the next quote
-				// If $starting index is the beginning of the string (0), using -1 will get the last character in the string, we don't want that
-				if ($startingIndex !== 0 && substr($standardCategories, $startingIndex - 1, 1) === $this->quote) {
-					// The ending index is the next quote, plus the starting index, plus 1 to include the quote
-					$endingIndex = strpos(substr($standardCategories, $startingIndex), $this->quote) + $startingIndex + 1;
-					
-					// Reduce the starting index by 1 to include the quote
-					$startingIndex --;
-				}
-				// If this category doesn't have a quote before it
-				else {
-					// Find the next space
-					$endingIndex = strpos(substr($standardCategories, $startingIndex), ' ') + $startingIndex;
+                return false;
+            }
 
-					// If there wasn't one found, the end will be the end of the categories string
-					if (!$endingIndex) {
-						$endingIndex = strlen($standardCategories);
-					}
-				}
+            // Get this id
+            $id = $newCategory->id;
+        }
 
-				// Get this special category
-				$specialCategory = substr($standardCategories, $startingIndex, $endingIndex - $startingIndex);
+        return [$id];
+    }
 
-				// Remove it from the 'standard' category list and trim any now existing white space
-				$standardCategories = trim(substr($standardCategories, 0, $startingIndex) . substr($standardCategories, $endingIndex));
+    private function separateSpecialCategories($data, $standardCategories, $categoryGroups)
+    {
+        // Set up an empty array
+        $categoriesArray = [];
 
-				// Create a key for the entry which matches this category's group
-				$categoriesArray['soundcloudCategories' . ucfirst($group)] = $this->saveSpecialCategory($group, $specialCategory);
-			}
-		}
+        foreach ($categoryGroups as $group) {
+            $startingIndex = strpos($standardCategories, strtolower($group) . ':');
 
-		// Assign what is left of the category string as the standard categories
-		// $categoriesArray['standardCategories'] = $standardCategories;
+            // If we found this special marker in the standard categories
+            if ($startingIndex !== false) {
+                // If this category has a quote before it, look for the next quote
+                // If $starting index is the beginning of the string (0), using -1 will get the last character in the string, we don't want that
+                if ($startingIndex !== 0 && substr($standardCategories, $startingIndex - 1, 1) === $this->quote) {
+                    // The ending index is the next quote, plus the starting index, plus 1 to include the quote
+                    $endingIndex = strpos(substr($standardCategories, $startingIndex), $this->quote) + $startingIndex + 1;
 
-		return $categoriesArray;
-	}
+                    // Reduce the starting index by 1 to include the quote
+                    $startingIndex--;
+                } else {
+                    // If this category doesn't have a quote before it
+                    // Find the next space
+                    $endingIndex = strpos(substr($standardCategories, $startingIndex), ' ') + $startingIndex;
 
-	public function getCategories($data, $categoryGroups)
-	{
-		$categories 		= array();
-		$standardCategories = '';
-		$genreList 			= $data['genre'];
-		$tagList 			= $data['tag_list'];
+                    // If there wasn't one found, the end will be the end of the categories string
+                    if (!$endingIndex) {
+                        $endingIndex = strlen($standardCategories);
+                    }
+                }
 
-		// If this entry has tags (first one is counted as the genre)
-		if (!empty($genreList) || !empty($tagList))
-		{
-			// If the genre is set
-			if (!empty($genreList))
-			{
-				// Add it to the list
-				$standardCategories .= trim($genreList);
+                // Get this special category
+                $specialCategory = substr($standardCategories, $startingIndex, $endingIndex - $startingIndex);
 
-				// If the genre has a space inside of it, we need to quote it so it's formatting is consistent with the other tags
-				if (strpos($standardCategories, ' '))
-				{
-					$standardCategories = $this->quote . $standardCategories . $this->quote;
-				}
-			}
+                // Remove it from the 'standard' category list and trim any now existing white space
+                $standardCategories = trim(substr($standardCategories, 0, $startingIndex) . substr($standardCategories, $endingIndex));
 
-			// If there is a remaining tag list
-			if (!empty($tagList))
-			{
-				// Add in the rest of the tags
-				$standardCategories .= ' ' . $tagList;
-			}
+                // Create a key for the entry which matches this category's group
+                if (Craft::$app->fields->getFieldByHandle('soundcloudCategories' . ucfirst($group))) {
+                    $categoriesArray['soundcloudCategories' . ucfirst($group)] = $this->saveSpecialCategory($group, $specialCategory);
+                }
+            }
+        }
 
-			// Lower case the tags to help limit the effects of human error on tag input
-			$standardCategories = strtolower($standardCategories);
+        // Assign what is left of the category string as the standard categories
+        // $categoriesArray['standardCategories'] = $standardCategories;
 
-			// If we need to check for special categories present, handle that separately
-			if (is_array($categoryGroups)) {
-				$categories = $this->separateSpecialCategories($data, $standardCategories, $categoryGroups);
-			}
-			// Otherwise, just assign the standard categories as a key here
-			else {
-				// $categories['standardCategories'] = $standardCategories;
-			}
-		}
+        return $categoriesArray;
+    }
 
-		return $categories;
-	}
+    public function getCategories($data, $categoryGroups)
+    {
+        $categories = [];
+        $standardCategories = '';
+        $genreList = $data['genre'];
+        $tagList = $data['tag_list'];
+
+        // If this entry has tags (first one is counted as the genre)
+        if (!empty($genreList) || !empty($tagList)) {
+            // If the genre is set
+            if (!empty($genreList)) {
+                // Add it to the list
+                $standardCategories .= trim($genreList);
+
+                // If the genre has a space inside of it, we need to quote it so it's formatting is consistent with the other tags
+                if (strpos($standardCategories, ' ')) {
+                    $standardCategories = $this->quote . $standardCategories . $this->quote;
+                }
+            }
+
+            // If there is a remaining tag list
+            if (!empty($tagList)) {
+                // Add in the rest of the tags
+                $standardCategories .= ' ' . $tagList;
+            }
+
+            // Lower case the tags to help limit the effects of human error on tag input
+            $standardCategories = strtolower($standardCategories);
+
+            // If we need to check for special categories present, handle that separately
+            if (is_array($categoryGroups)) {
+                $categories = $this->separateSpecialCategories($data, $standardCategories, $categoryGroups);
+            } else {
+                // Otherwise, just assign the standard categories as a key here
+                // $categories['standardCategories'] = $standardCategories;
+            }
+        }
+
+        return $categories;
+    }
 
     // Private Methods
     // =========================================================================
@@ -256,4 +251,3 @@ class SoundcloudCategories extends Component
         die();
     }
 }
-

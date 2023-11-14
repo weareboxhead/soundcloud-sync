@@ -62,7 +62,7 @@ class SoundcloudSyncUpdateEntry extends BaseJob
      *
      * @var Array
      */
-    public $trackData;
+    public array $trackData;
 
     // Public Methods
     // =========================================================================
@@ -74,10 +74,10 @@ class SoundcloudSyncUpdateEntry extends BaseJob
      *
      * More info: https://github.com/yiisoft/yii2-queue
      */
-    public function execute($queue)
+    public function execute($queue): void
     {
         // Process creation of a new entry
-        SoundcloudSync::$plugin->soundcloudEntries->updateEntry($this->entryId, $this->trackData);
+        SoundcloudSync::getInstance()->soundcloudEntries->updateEntry($this->entryId, $this->trackData);
     }
 
     // Protected Methods
@@ -88,7 +88,7 @@ class SoundcloudSyncUpdateEntry extends BaseJob
      *
      * @return string The default task description
      */
-    protected function defaultDescription(): string
+    protected function defaultDescription(): ?string
     {
         return Craft::t('soundcloud-sync', 'Soundcloud sync update entry: ' . $this->trackData['title']);
     }

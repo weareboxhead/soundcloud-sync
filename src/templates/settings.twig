@@ -18,58 +18,70 @@
 {% do view.registerAssetBundle("boxhead\\soundcloudsync\\assetbundles\\soundcloudsync\\SoundcloudSyncAsset") %}
 
 {{ forms.autosuggestField({
+        first: true,
         label: 'Soundcloud Client ID',
         instructions: 'Provided when you register an application at soundcloud.com',
-        id: 'soundcloudClientId',
+        id: 'soundcloud-client-id',
         name: 'soundcloudClientId',
         value: settings.soundcloudClientId,
-        suggestEnvVars: true
+        suggestEnvVars: true,
+        required: true,
+        errors: settings.getErrors('soundcloudClientId')
     })
 }}
 
 {{ forms.autosuggestField({
         label: 'Soundcloud Client Secret',
         instructions: 'Provided when you register an application at soundcloud.com',
-        id: 'soundcloudClientSecret',
+        id: 'soundcloudclient-secret',
         name: 'soundcloudClientSecret',
         value: settings.soundcloudClientSecret,
-        suggestEnvVars: true
+        suggestEnvVars: true,
+        required: true,
+        errors: settings.getErrors('soundcloudClientSecret')
     })
 }}
 
 {{ forms.autosuggestField({
         label: 'Soundcloud User ID',
         instructions: 'Optionally provide a specific Soundcloud User ID to request data from. The default will be to get the data from the authorized Soundcloud user.',
-        id: 'soundcloudUserId',
+        id: 'soundcloud-user-id',
         name: 'soundcloudUserId',
         value: settings.soundcloudUserId,
-        suggestEnvVars: true
+        suggestEnvVars: true,
+        required: true,
+        errors: settings.getErrors('soundcloudUserId')
     })
 }}
 
 {{ forms.textField({
         label: 'Section ID',
         instructions: 'The ID of the section to save the Soundcloud track data as entries to.',
-        id: 'sectionId',
+        id: 'section-id',
         name: 'sectionId',
-        value: settings.sectionId
+        value: settings.sectionId,
+        required: true,
+        errors: settings.getErrors('sectionId')
     })
 }}
 
 {{ forms.textField({
         label: 'Entry Type ID',
         instructions: 'The ID of the Entry Type to save the entries as.',
-        id: 'entryTypeId',
+        id: 'entry-type-id',
         name: 'entryTypeId',
-        value: settings.entryTypeId
+        value: settings.entryTypeId,
+        required: true,
+        errors: settings.getErrors('entryTypeId')
     })
 }}
 
 {{ forms.textField({
         label: 'Category Groups',
         instructions: 'A comma separated list of category prefixes e.g. series, speaker',
-        id: 'categoryGroups',
+        id: 'category-groups',
         name: 'categoryGroups',
-        value: settings.categoryGroups
+        value: settings.categoryGroups,
+        errors: settings.getErrors('categoryGroups')
     })
 }}

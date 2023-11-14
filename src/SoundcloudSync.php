@@ -48,62 +48,39 @@ use boxhead\soundcloudsync\services\SoundcloudCategories as SoundcloudCategories
  */
 class SoundcloudSync extends Plugin
 {
-    // Static Properties
-    // =========================================================================
-
-    /**
-     * Static property that is an instance of this plugin class so that it can be accessed via
-     * SoundcloudSync::$plugin
-     *
-     * @var SoundcloudSync
-     */
-    public static $plugin;
-
     // Public Properties
     // =========================================================================
 
-    /**
-     * To execute your plugin’s migrations, you’ll need to increase its schema version.
-     *
-     * @var string
-     */
     public string $schemaVersion = '1.0.0';
-
-    /**
-     * Set to `true` if the plugin should have a settings view in the control panel.
-     *
-     * @var bool
-     */
     public bool $hasCpSettings = true;
-
-    /**
-     * Set to `true` if the plugin should have its own section (main nav item) in the control panel.
-     *
-     * @var bool
-     */
     public bool $hasCpSection = false;
 
     // Public Methods
     // =========================================================================
 
-    /**
-     * Set our $plugin static property to this class so that it can be accessed via
-     * SoundcloudSync::$plugin
-     *
-     * Called after the plugin class is instantiated; do any one-time initialization
-     * here such as hooks and events.
-     *
-     * If you have a '/vendor/autoload.php' file, it will be loaded for you automatically;
-     * you do not need to load it in your init() method.
-     *
-     */
     public function init()
     {
         parent::init();
-        self::$plugin = $this;
 
         Craft::setAlias('@soundcloud', __DIR__);
 
+        Craft::$app->onInit(function () {
+            $this->attachEventHandlers();
+        });
+        
+
+        Craft::info(
+            Craft::t(
+                'soundcloud-sync',
+                '{name} plugin loaded',
+                ['name' => $this->name]
+            ),
+            __METHOD__
+        );
+    }
+
+    private function attachEventHandlers(): void
+    {
         // Register our site routes
         Event::on(
             UrlManager::class,
@@ -139,26 +116,6 @@ class SoundcloudSync extends Plugin
         Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES, function (RegisterComponentTypesEvent $event) {
             $event->types[] = SyncUtility::class;
         });
-
-        // Do something after we're installed
-        Event::on(
-            Plugins::class,
-            Plugins::EVENT_AFTER_INSTALL_PLUGIN,
-            function (PluginEvent $event) {
-                if ($event->plugin === $this) {
-                    // We were just installed
-                }
-            }
-        );
-
-        Craft::info(
-            Craft::t(
-                'soundcloud-sync',
-                '{name} plugin loaded',
-                ['name' => $this->name]
-            ),
-            __METHOD__
-        );
     }
 
     // Protected Methods

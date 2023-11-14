@@ -10,10 +10,9 @@
 
 namespace boxhead\soundcloudsync\models;
 
-use boxhead\soundcloudsync\SoundcloudSync;
-
 use Craft;
 use craft\base\Model;
+use boxhead\soundcloudsync\SoundcloudSync;
 
 /**
  * Soundcloud Model
@@ -33,21 +32,21 @@ class Oauth extends Model
     // =========================================================================
 
     /**
-     * Access Token 
+     * Access Token
      *
      * @var string
      */
-    public $accessToken;
-    
+    public string $accessToken;
+
     /**
-     * Refresh Token 
+     * Refresh Token
      *
      * @var string
      */
-    public $refreshToken;
-    
+    public string $refreshToken;
+
     /**
-     * Access Token expiry date/time 
+     * Access Token expiry date/time
      *
      * @var datetime
      */
@@ -66,7 +65,7 @@ class Oauth extends Model
      *
      * @return array
      */
-    public function rules()
+    public function defineRules(): array
     {
         return [
             [['accessToken', 'refreshToken'], 'string'],

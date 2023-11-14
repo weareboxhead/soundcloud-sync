@@ -11,6 +11,8 @@
 namespace boxhead\soundcloudsync\controllers;
 
 use Craft;
+use craft\web\View;
+use craft\web\Response;
 use craft\web\Controller;
 use boxhead\soundcloudsync\SoundcloudSync;
 use boxhead\soundcloudsync\jobs\SoundcloudSyncCreateEntry;
@@ -57,11 +59,11 @@ class SyncController extends Controller
      *
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex(): Response
     {
-        $remoteData = SoundcloudSync::$plugin->soundcloudEntries->getRemoteData();
+        $remoteData = SoundcloudSync::getInstance()->soundcloudEntries->getRemoteData();
 
-        $localData = SoundcloudSync::$plugin->soundcloudEntries->getLocalData();
+        $localData = SoundcloudSync::getInstance()->soundcloudEntries->getLocalData();
 
         // Determine which entries we are missing by id
         $missingTracks = array_diff($remoteData['ids'], $localData['ids']);
@@ -87,16 +89,45 @@ class SyncController extends Controller
             ]));
         }
 
-        return 'Soundcloud Sync running';
+        $message = 'Sync in progress.';
+
+        return $this->getResponse($message);
     }
 
     public function actionGetStreamUrl() {
         $trackId = Craft::$app->request->getQueryParam('trackId');
 
-        $url = SoundcloudSync::$plugin->soundcloudEntries->getTrackStreamUrl($trackId);
+        $url = SoundcloudSync::getInstance()->soundcloudEntries->getTrackStreamUrl($trackId);
 
         return $this->asJson([
             'url' => $url
         ]);
+    }
+
+    /**
+     * Returns a response.
+     */
+    private function getResponse(string $message, bool $success = true): Response
+    {
+        $request = Craft::$app->getRequest();
+
+        // If front-end or JSON request
+        // Run the queue to ensure action is completed in full
+        if (Craft::$app->getView()->templateMode == View::TEMPLATE_MODE_SITE || $request->getAcceptsJson()) {
+            Craft::$app->runAction('queue/run');
+
+            return $this->asJson([
+                'success' => $success,
+                'message' => Craft::t('soundcloud-sync', $message),
+            ]);
+        }
+
+        if ($success) {
+            Craft::$app->getSession()->setNotice(Craft::t('soundcloud-sync', $message));
+        } else {
+            Craft::$app->getSession()->setError(Craft::t('soundcloud-sync', $message));
+        }
+
+        return $this->redirectToPostedUrl(null, $request->referrer);
     }
 }

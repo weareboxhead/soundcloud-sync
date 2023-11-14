@@ -335,7 +335,7 @@ class Soundcloud
         );
 
         $postData = array_filter(array_merge($defaultPostData, $postData));
-
+  
         return $this->_getAccessToken($postData, $curlOptions);
     }
 
