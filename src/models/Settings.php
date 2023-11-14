@@ -37,12 +37,12 @@ class Settings extends Model
      /**
      * @var int Section ID
      */
-    public $sectionId = 1;
+    public int $sectionId = 1;
 
      /**
      * @var int Entry Type ID
      */
-    public $entryTypeId = 1;
+    public int $entryTypeId = 1;
 
      /**
      * @var string Category Groups
@@ -77,7 +77,7 @@ class Settings extends Model
      *
      * @return array
      */
-    public function rules()
+    public function defineRules(): array
     {
         return [
             [['soundcloudClientId', 'soundcloudClientSecret', 'soundcloudUserId', 'sectionId', 'entryTypeId'], 'required'],
@@ -94,7 +94,7 @@ class Settings extends Model
     {
         return Craft::parseEnv($this->soundcloudClientId);
     }
-    
+
     /**
      * @return string the parsed soundcloud client secret key (e.g. 'XXXXXXXXXXX')
      */

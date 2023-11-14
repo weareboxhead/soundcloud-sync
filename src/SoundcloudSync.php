@@ -10,20 +10,22 @@
 
 namespace boxhead\soundcloudsync;
 
-use boxhead\soundcloudsync\services\SoundcloudEntries as SoundcloudEntriesService;
-use boxhead\soundcloudsync\services\SoundcloudCategories as SoundcloudCategoriesService;
-use boxhead\soundcloudsync\variables\SoundcloudSyncVariable;
-use boxhead\soundcloudsync\models\Settings;
-
 use Craft;
+use yii\base\Event;
+use craft\base\Model;
 use craft\base\Plugin;
+use craft\web\UrlManager;
 use craft\services\Plugins;
 use craft\events\PluginEvent;
-use craft\web\UrlManager;
-use craft\web\twig\variables\CraftVariable;
+use craft\services\Utilities;
 use craft\events\RegisterUrlRulesEvent;
-
-use yii\base\Event;
+use boxhead\soundcloudsync\models\Settings;
+use craft\web\twig\variables\CraftVariable;
+use craft\events\RegisterComponentTypesEvent;
+use boxhead\soundcloudsync\utilities\SyncUtility;
+use boxhead\soundcloudsync\variables\SoundcloudSyncVariable;
+use boxhead\soundcloudsync\services\SoundcloudEntries as SoundcloudEntriesService;
+use boxhead\soundcloudsync\services\SoundcloudCategories as SoundcloudCategoriesService;
 
 /**
  * Craft plugins are very much like little applications in and of themselves. We’ve made
@@ -65,21 +67,21 @@ class SoundcloudSync extends Plugin
      *
      * @var string
      */
-    public $schemaVersion = '1.0.0';
+    public string $schemaVersion = '1.0.0';
 
     /**
      * Set to `true` if the plugin should have a settings view in the control panel.
      *
      * @var bool
      */
-    public $hasCpSettings = true;
+    public bool $hasCpSettings = true;
 
     /**
      * Set to `true` if the plugin should have its own section (main nav item) in the control panel.
      *
      * @var bool
      */
-    public $hasCpSection = false;
+    public bool $hasCpSection = false;
 
     // Public Methods
     // =========================================================================
@@ -99,6 +101,8 @@ class SoundcloudSync extends Plugin
     {
         parent::init();
         self::$plugin = $this;
+
+        Craft::setAlias('@soundcloud', __DIR__);
 
         // Register our site routes
         Event::on(
@@ -131,6 +135,11 @@ class SoundcloudSync extends Plugin
             }
         );
 
+        // Sync Utility
+        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES, function (RegisterComponentTypesEvent $event) {
+            $event->types[] = SyncUtility::class;
+        });
+
         // Do something after we're installed
         Event::on(
             Plugins::class,
@@ -142,24 +151,6 @@ class SoundcloudSync extends Plugin
             }
         );
 
-/**
- * Logging in Craft involves using one of the following methods:
- *
- * Craft::trace(): record a message to trace how a piece of code runs. This is mainly for development use.
- * Craft::info(): record a message that conveys some useful information.
- * Craft::warning(): record a warning message that indicates something unexpected has happened.
- * Craft::error(): record a fatal error that should be investigated as soon as possible.
- *
- * Unless `devMode` is on, only Craft::warning() & Craft::error() will log to `craft/storage/logs/web.log`
- *
- * It's recommended that you pass in the magic constant `__METHOD__` as the second parameter, which sets
- * the category to the method (prefixed with the fully qualified class name) where the constant appears.
- *
- * To enable the Yii debug toolbar, go to your user account in the AdminCP and check the
- * [] Show the debug toolbar on the front end & [] Show the debug toolbar on the Control Panel
- *
- * http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
- */
         Craft::info(
             Craft::t(
                 'soundcloud-sync',
@@ -178,9 +169,9 @@ class SoundcloudSync extends Plugin
      *
      * @return \craft\base\Model|null
      */
-    protected function createSettingsModel()
+    protected function createSettingsModel(): ?Model
     {
-        return new Settings();
+        return Craft::createObject(Settings::class);
     }
 
     /**
@@ -189,11 +180,12 @@ class SoundcloudSync extends Plugin
      *
      * @return string The rendered settings HTML
      */
-    protected function settingsHtml(): string
+    protected function settingsHtml(): ?string
     {
         return Craft::$app->view->renderTemplate(
             'soundcloud-sync/settings',
             [
+                'plugin' => $this,
                 'settings' => $this->getSettings()
             ]
         );

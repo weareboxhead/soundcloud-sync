@@ -11,7 +11,6 @@
 namespace boxhead\soundcloudsync\controllers;
 
 use Craft;
-
 use craft\web\Controller;
 use boxhead\soundcloudsync\SoundcloudSync;
 use boxhead\soundcloudsync\jobs\SoundcloudSyncCreateEntry;
@@ -47,7 +46,7 @@ class SyncController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['index', 'get-stream-url'];
+    protected array|int|bool $allowAnonymous = ['index', 'get-stream-url'];
 
     // Public Methods
     // =========================================================================
@@ -65,28 +64,28 @@ class SyncController extends Controller
         $localData = SoundcloudSync::$plugin->soundcloudEntries->getLocalData();
 
         // Determine which entries we are missing by id
-		$missingTracks = array_diff($remoteData['ids'], $localData['ids']);
-        
+        $missingTracks = array_diff($remoteData['ids'], $localData['ids']);
+
         // Determine which entries need updating (all active tracks which we aren't about to create)
-		$updatingTracks = array_diff($remoteData['ids'], $missingTracks);
+        $updatingTracks = array_diff($remoteData['ids'], $missingTracks);
 
         // Get the Craft queue
         $queue = Craft::$app->getQueue();
 
-		// For each missing id
-		foreach ($missingTracks as $id) {
+        // For each missing id
+        foreach ($missingTracks as $id) {
             $queue->push(new SoundcloudSyncCreateEntry([
                 'trackData' => $remoteData['tracks'][$id]
             ]));
-		}
+        }
 
-		// For each updating track
-		foreach ($updatingTracks as $id) {
+        // For each updating track
+        foreach ($updatingTracks as $id) {
             $queue->push(new SoundcloudSyncUpdateEntry([
                 'entryId' => $localData['tracks'][$id]->id,
                 'trackData' => $remoteData['tracks'][$id]
             ]));
-		}
+        }
 
         return 'Soundcloud Sync running';
     }
@@ -94,7 +93,7 @@ class SyncController extends Controller
     public function actionGetStreamUrl() {
         $trackId = Craft::$app->request->getQueryParam('trackId');
 
-		$url = SoundcloudSync::$plugin->soundcloudEntries->getTrackStreamUrl($trackId);
+        $url = SoundcloudSync::$plugin->soundcloudEntries->getTrackStreamUrl($trackId);
 
         return $this->asJson([
             'url' => $url
