@@ -13,7 +13,6 @@ namespace boxhead\soundcloudsync\services;
 
 use Craft;
 use DateTime;
-use craft\helpers\App;
 use craft\base\Component;
 use craft\elements\Entry;
 use boxhead\soundcloudsync\SoundcloudSync;
@@ -77,11 +76,11 @@ class SoundcloudEntries extends Component
             die();
         }
 
-        $this->clientId = $this->settings->soundcloudClientId;
-        $this->clientSecret = $this->settings->soundcloudClientSecret;
+        $this->clientId = $this->settings->getSoundcloudClientId();
+        $this->clientSecret = $this->settings->getSoundcloudClientSecret();
+        $this->userId = $this->settings->getSoundcloudUserId();
         $this->sectionId = $this->settings->sectionId;
         $this->entryTypeId = $this->settings->entryTypeId;
-        $this->userId = $this->settings->soundcloudUserId;
         $this->categoryGroups = $this->settings->categoryGroups ? explode(',', str_replace(' ', '', $this->settings->categoryGroups)) : [];
 
         // Create our calling object

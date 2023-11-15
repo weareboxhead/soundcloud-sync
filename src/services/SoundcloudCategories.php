@@ -1,37 +1,11 @@
 <?php
 
-/**
- * Soundcloud Sync plugin for Craft CMS 3.x
- *
- * Sync your Soundcloud track data into Craft Entries
- *
- * @link      https://boxhead.io
- * @copyright Copyright (c) 2021 Boxhead
- */
-
 namespace boxhead\soundcloudsync\services;
 
 use Craft;
-use DateTime;
 use craft\base\Component;
 use craft\elements\Category;
 use craft\helpers\StringHelper;
-use boxhead\soundcloudsync\SoundcloudSync;
-use boxhead\soundcloudsync\wrapper\services\Services_Soundcloud;
-
-/**
- * SoundcloudCategories Service
- *
- * All of your plugin’s business logic should go in services, including saving data,
- * retrieving data, etc. They provide APIs that your controllers, template variables,
- * and other plugins can interact with.
- *
- * https://craftcms.com/docs/plugins/services
- *
- * @author    Boxhead
- * @package   SoundcloudSync
- * @since     1.0.0
- */
 class SoundcloudCategories extends Component
 {
     // Any multiple word tags will be split by this
@@ -46,26 +20,6 @@ class SoundcloudCategories extends Component
 
     // Public Methods
     // =========================================================================
-
-    /**
-     * This function can literally be anything you want, and you can have as many service
-     * functions as you want
-     *
-     * From any other plugin file, call it like this:
-     *
-     *     SoundcloudSync::getInstance()->soundcloudCategories->exampleService()
-     *
-     * @return mixed
-     */
-    // public function exampleService()
-    // {
-    //     $result = 'something';
-    //     // Check our Plugin's settings for `someAttribute`
-    //     if (SoundcloudSync::getInstance()-->getSettings()->someAttribute) {
-    //     }
-
-    //     return $result;
-    // }
 
     private function camelCase($string)
     {

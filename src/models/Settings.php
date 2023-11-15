@@ -56,7 +56,6 @@ class Settings extends Model
      */
     public function getSoundcloudClientSecret(): string
     {
-        die('here');
         return App::parseEnv($this->soundcloudClientSecret);
     }
 
