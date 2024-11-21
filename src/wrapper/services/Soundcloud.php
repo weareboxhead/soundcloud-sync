@@ -185,7 +185,7 @@ class Soundcloud
      *
      * @access private
      */
-    private $_requestFormat;
+    private $_responseFormat;
 
     /**
      * Available response formats
