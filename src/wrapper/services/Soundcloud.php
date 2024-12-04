@@ -93,9 +93,10 @@ class Soundcloud
      * @static
      */
      private static $_curlDefaultOptions = array(
-         CURLOPT_HEADER => true,
-         CURLOPT_RETURNTRANSFER => true,
-         CURLOPT_USERAGENT => ''
+        CURLOPT_HEADER => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_USERAGENT => '',
+        CURLOPT_FOLLOWLOCATION => true,
      );
 
     /**
@@ -165,8 +166,8 @@ class Soundcloud
      * @static
      */
     private static $_paths = array(
-        'authorize' => '/oauth/connect',
-        'access_token' => 'oauth2/token',
+        'authorize' => 'connect',
+        'access_token' => 'oauth/token',
     );
 
     /**
@@ -197,7 +198,7 @@ class Soundcloud
      */
     private static $_responseFormats = array(
         '*' => '*/*',
-        'json' => 'application/json',
+        'json' => 'application/json; charset=utf-8',
         'xml' => 'application/xml'
     );
 
@@ -273,7 +274,8 @@ class Soundcloud
      */
     function getAccessTokenUrl($params = array())
     {
-        return $this->_buildUrl(self::$_paths['access_token'], $params, false);
+        return 'https://secure.soundcloud.com/oauth/token';
+        // return $this->_buildUrl(self::$_paths['access_token'], $params, false);
     }
 
     /**
@@ -326,10 +328,10 @@ class Soundcloud
     function accessToken($code = null, $postData = array(), $curlOptions = array())
     {
         $defaultPostData = array(
-            'code' => $code,
-            'client_id' => $this->_clientId,
-            'client_secret' => $this->_clientSecret,
-            'redirect_uri' => $this->_redirectUri,
+            // 'code' => $code,
+            // 'client_id' => $this->_clientId,
+            // 'client_secret' => $this->_clientSecret,
+            // 'redirect_uri' => $this->_redirectUri,
             'grant_type' => 'client_credentials'
             // 'grant_type' => 'authorization_code'
         );
@@ -355,8 +357,8 @@ class Soundcloud
     {
         $defaultPostData = array(
             'refresh_token' => $refreshToken,
-            'client_id' => $this->_clientId,
-            'client_secret' => $this->_clientSecret,
+            // 'client_id' => $this->_clientId,
+            // 'client_secret' => $this->_clientSecret,
             // 'redirect_uri' => $this->_redirectUri,
             'grant_type' => 'refresh_token'
         );
@@ -818,7 +820,15 @@ class Soundcloud
      */
     protected function _getAccessToken($postData, $curlOptions = array())
     {
-        $options = array(CURLOPT_POST => true, CURLOPT_POSTFIELDS => $postData);
+        $options = array(
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query($postData),
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/x-www-form-urlencoded',
+                'Authorization: Basic ' . base64_encode($this->_clientId . ':' . $this->_clientSecret)
+            )
+        );
+
         $options += $curlOptions;
 
         $response = json_decode(
@@ -955,5 +965,4 @@ class Soundcloud
             );
         }
     }
-
 }
