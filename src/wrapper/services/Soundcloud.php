@@ -329,11 +329,9 @@ class Soundcloud
     {
         $defaultPostData = array(
             // 'code' => $code,
-            // 'client_id' => $this->_clientId,
-            // 'client_secret' => $this->_clientSecret,
-            // 'redirect_uri' => $this->_redirectUri,
+            'client_id' => $this->_clientId,
+            'client_secret' => $this->_clientSecret,
             'grant_type' => 'client_credentials'
-            // 'grant_type' => 'authorization_code'
         );
 
         $postData = array_filter(array_merge($defaultPostData, $postData));
@@ -357,9 +355,8 @@ class Soundcloud
     {
         $defaultPostData = array(
             'refresh_token' => $refreshToken,
-            // 'client_id' => $this->_clientId,
-            // 'client_secret' => $this->_clientSecret,
-            // 'redirect_uri' => $this->_redirectUri,
+            'client_id' => $this->_clientId,
+            'client_secret' => $this->_clientSecret,
             'grant_type' => 'refresh_token'
         );
         $postData = array_merge($defaultPostData, $postData);
